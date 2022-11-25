@@ -17,7 +17,7 @@ contract TheRewarderPool {
     uint256 private constant REWARDS_ROUND_MIN_DURATION = 5 days;
 
     uint256 public lastSnapshotIdForRewards; // stores how many tokens have each person
-    uint256 public lastRecordedSnapshotTimestamp; 
+    uint256 public lastRecordedSnapshotTimestamp; // stores in time when were distributed the last rewards 
 
     mapping(address => uint256) public lastRewardTimestamps; // stores in seconds when was the last time the person claimed rewards
 
@@ -57,11 +57,20 @@ contract TheRewarderPool {
         );
     }
 
+    /**
+     * @notice When somenone withdraws their DVT token, the accountToken is burned first based on the amount to withdraw.
+     * @dev accToken is pegged 1:1 with the liquidity token
+     */
     function withdraw(uint256 amountToWithdraw) external {
         accToken.burn(msg.sender, amountToWithdraw);
         require(liquidityToken.transfer(msg.sender, amountToWithdraw));
     }
 
+    /**
+     * @notice first checks if it's time for rewards, if it is, checks how many tokens has each person and the current time 
+    the rewards are being distributed. 
+     * @dev uint256 lastSnapshotIdForRewards; stores how many tokens have each person
+     */
     function distributeRewards() public returns (uint256) {
         uint256 rewards = 0;
 
@@ -84,12 +93,23 @@ contract TheRewarderPool {
         return rewards;     
     }
 
+    /**
+     * @dev uint256 lastSnapshotIdForRewards; stores how many tokens have each person
+            uint256 lastRecordedSnapshotTimestamp; stores in time when were distributed the last rewards
+            uint256 public roundNumber; Tracks number of rounds
+     */
     function _recordSnapshot() private {
         lastSnapshotIdForRewards = accToken.snapshot();
         lastRecordedSnapshotTimestamp = block.timestamp;
         roundNumber++;
     }
 
+    /**
+     * @notice checks if user has already retrieved rewards
+     * @dev mapping(address => uint256) public lastRewardTimestamps; stores in seconds when was the last 
+    time the person claimed rewards
+            uint256 lastRecordedSnapshotTimestamp; stores in time when were distributed the last rewards 
+     */
     function _hasRetrievedReward(address account) private view returns (bool) {
         return (
             lastRewardTimestamps[account] >= lastRecordedSnapshotTimestamp &&
@@ -97,6 +117,10 @@ contract TheRewarderPool {
         );
     }
 
+    /**
+     * @notice checks if 5 days have passed and returns True or False
+     * @dev REWARDS_ROUND_MIN_DURATION = 5 days;
+     */
     function isNewRewardsRound() public view returns (bool) {
         return block.timestamp >= lastRecordedSnapshotTimestamp + REWARDS_ROUND_MIN_DURATION;
     }
