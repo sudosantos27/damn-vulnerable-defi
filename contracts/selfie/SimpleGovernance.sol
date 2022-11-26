@@ -84,6 +84,9 @@ contract SimpleGovernance {
         );
     }
     
+    /**
+     * @dev to have enough votes we need more than 50% of total supply
+     */
     function _hasEnoughVotes(address account) private view returns (bool) {
         uint256 balance = governanceToken.getBalanceAtLastSnapshot(account);
         uint256 halfTotalSupply = governanceToken.getTotalSupplyAtLastSnapshot() / 2;
